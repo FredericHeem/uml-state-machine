@@ -98,9 +98,26 @@ function createEvents(state, transitions){
 
   const events = _.groupBy(transitions, 'event');
   //console.log("event ", events)
-  return _.reduce(events, (state, event) => {
-    state[event] = (context) => {
-      console.log("state ", state.name(), "event ", event)
+  return _.reduce(events, (state, transitions, key) => {
+    console.log("event key ", key),
+    console.log("transitions ", transitions)
+    state[key] = (context) => {
+
+      transitions.some(transition => {
+        if(transition.condition && !transition.condition()){
+            return false;
+        }
+        if(transition.actions){
+          console.log("transition.actions ", transition.actions.length)
+          transition.actions.forEach(action => action(context.action));
+        }
+
+        if(transition.nextState){
+          console.log("transition.nextState ", transition.nextState)
+        }
+        return true
+      })
+      console.log("state ", state.name())
       console.log("context ", context.action)
     }
     return state;

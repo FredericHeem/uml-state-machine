@@ -9,6 +9,9 @@ function Light() {
     },
     doOff() {
       console.log("doOff")
+    },
+    log(msg){
+      console.log(`light log: ${msg}`)
     }
   }
 }
@@ -32,7 +35,10 @@ const smDef = {
         onEntry: light => light.doOff(),
         transitions: [{
           event: "evOn",
-          nextState: "On"
+          nextState: "On",
+          actions:[
+            light => light.log("starting on")
+          ]
         }]
       },
       {
@@ -40,7 +46,10 @@ const smDef = {
         onEntry: light => light.doOn(),
         transitions: [{
           event: "evOff",
-          nextState: "Off"
+          nextState: "Off",
+          actions:[
+            light => light.log("starting off")
+          ]
         }]
       }
     ]
