@@ -1,5 +1,6 @@
 import {State} from './State';
-
+import {Machine} from './Machine';
 export {
-  State
+  State,
+  Machine
 }

@@ -56,5 +56,6 @@
     "postversion": "git push && git push --tags"
   },
   "dependencies": {
+    "lodash": "4.15.0"
   }
 }
