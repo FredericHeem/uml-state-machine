@@ -17,17 +17,13 @@ export function Machine(smDef, action) {
           details: event
         }
       }
-/*
-      for(let state of stateMap.values()){
-        console.log(state.name());
-        state[event.id] = (payload) => {
-          console.log("state ", state.name(), ", event ", event, ", payload: ", payload)
-        }
-      }
-*/
+
       machine[event.id] = (payload) => {
-        console.log("event ", event, ", payload: ", payload)
-        //getCurrentState()[event.id](machine)
+        console.log("event id ", event.id, ", payload: ", payload)
+        const currentState = getCurrentState();
+        console.log("getCurrentState ", currentState.name())
+        //console.log("currentState ", currentState)
+        currentState[event.id](machine)
       }
       return machine;
     }, machine);

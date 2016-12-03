@@ -78,25 +78,39 @@ export function walkOnExit(context, previousState, nextState) {
   }
 }
 
-export function State(smDef, stateInfo = {}, stateParent) {
-  //console.log("State ", stateInfo.name)
-  function createEvents(state, transitions){
-    if(!transitions){
-      return state
+function createAllEvents(state, events){
+  //console.log("createAllEvents ", state.name())
+  return _.reduce(events, (state, event) => {
+    //console.log("createAllEvents event ", state.name(), event.id)
+    state[event.id] = (context) => {
+      console.log("createAllEvents ", event, "event ", event)
+      console.log("createAllEvents context ", context.action)
     }
-    const events = _.groupBy(transitions, 'event');
-    //console.log("event ", events)
-    return _.reduce(events, (state, event) => {
-      state[event] = (context) => {
-        console.log("state ", state.name(), "event ", event)
-        console.log("context ", context.action)
-      }
-      return state;
-    }, state)
+    return state;
+  }, state)
+}
+
+function createEvents(state, transitions){
+  //console.log("createEvents ", state.name())
+  if(!transitions){
+    return state
   }
 
+  const events = _.groupBy(transitions, 'event');
+  //console.log("event ", events)
+  return _.reduce(events, (state, event) => {
+    state[event] = (context) => {
+      console.log("state ", state.name(), "event ", event)
+      console.log("context ", context.action)
+    }
+    return state;
+  }, state)
+}
 
-  let state = {
+export function State(smDef, stateInfo = {}, stateParent) {
+  //console.log("State ", stateInfo.name);
+
+  let state = Object.assign({}, stateParent, {
     isRoot() {
       return !stateParent
     },
@@ -120,6 +134,11 @@ export function State(smDef, stateInfo = {}, stateParent) {
       console.log("State onExit ", stateInfo.name)
       if(stateInfo.onExit) stateInfo.onExit(context)
     }
+  })
+
+  if(!stateParent){
+    state = createAllEvents(state, smDef.events)
+    console.log("state ", state)
   }
 
   state = createEvents(state, stateInfo.transitions);

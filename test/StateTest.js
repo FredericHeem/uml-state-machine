@@ -37,7 +37,6 @@ const smDef = {
 
 describe('Machine', function () {
   const map = buildStateMap(smDef);
-  const machine = {}
   it('isRoot', function() {
     const rootState = State(smDef, smDef.state, null);
     assert.isTrue(rootState.isRoot());
@@ -58,7 +57,6 @@ describe('Machine', function () {
     assert.equal(map.size, 3);
     assert(map.get('On'))
     assert(map.get('Light'))
-    //console.log("LIGHT ", map.get('Light'))
 
     for(let state of map.values()){
         assert(state.name())

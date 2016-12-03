@@ -61,15 +61,13 @@ describe('Machine', function () {
 
   it('Machine 1', () => {
     try {
-
-      machine.evOn()
+      machine.evOff()
       machine.evOn()
       machine.evOff()
       machine.evOff()
     }
     catch (error) {
       console.error(error)
-      //console.error(JSON.stringify(error))
       assert(!error)
     }
   });
