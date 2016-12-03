@@ -1,8 +1,5 @@
-import createActionAsync, {ASYNC_META} from './createActionAsync';
-import createReducerAsync from './createReducerAsync';
+import {State} from './State';
 
 export {
-  ASYNC_META,
-  createActionAsync,
-  createReducerAsync
+  State
 }

@@ -1,5 +1,4 @@
-export const {
-  nane: "Basic machine 1",
+export const sm = {
   state: {
 
   }
