@@ -1,20 +1,7 @@
-import _ from 'lodash';
 import { assert } from 'chai';
-import { Machine, State } from '../src/index';
-import {traverseState, buildStateMap, isAncestor, walkOnEntry, walkOnExit} from "../src/State";
+import {State, traverseState, buildStateMap, isAncestor} from "../src/State";
 
-function Light() {
-  return {
-    doOn() {
-      console.log("doOff")
-    },
-    doOff() {
-      console.log("doOff")
-    }
-  }
-}
-
-const stateMachineDefinition = {
+const smDef = {
   name: "Basic machine 1",
   events: [
     {
@@ -31,58 +18,32 @@ const stateMachineDefinition = {
       {
         name: "Off",
         onEntry: light => light.doOff(),
-        transition: {
+        transitions: [{
           event: "evOn",
           nextState: "On"
-        }
+        }]
       },
       {
         name: "On",
         onEntry: light => light.doOn(),
-        transition: {
+        transitions: [{
           event: "evOff",
           nextState: "Off"
-        }
+        }]
       }
     ]
   }
 }
 
 describe('Machine', function () {
-  const light = Light()
-  const map = buildStateMap(stateMachineDefinition.state);
-  const machine = Machine(stateMachineDefinition, light);
-
-  it('Light on', () => {
-    light.doOn();
-  });
-
-  it('Light off', () => {
-    light.doOff();
-  });
-
-  it('isRoot', () => {
-    light.doOff();
-    const rootState = State(stateMachineDefinition.state, null);
+  const map = buildStateMap(smDef);
+  const machine = {}
+  it('isRoot', function() {
+    const rootState = State(smDef, smDef.state, null);
     assert.isTrue(rootState.isRoot());
     assert.isFalse(rootState.isLeaf());
   });
 
-  it('Machine 1', () => {
-    try {
-      const machine = Machine(stateMachineDefinition, light);
-      machine.evOn()
-      machine.evOn()
-      machine.evOff()
-      machine.evOff()
-    }
-    catch (error) {
-      console.error(error)
-      //console.error(JSON.stringify(error))
-      //assert(!error)
-    }
-
-  });
   it('traverseState', () => {
     const callback = (state, parent) => {
       assert(state)
@@ -91,10 +52,17 @@ describe('Machine', function () {
         assert(parent.name)
       }
     }
-    traverseState(stateMachineDefinition.state, null, callback);
+    traverseState(smDef.state, null, callback);
   });
   it('buildStateMap', () => {
     assert.equal(map.size, 3);
+    assert(map.get('On'))
+    assert(map.get('Light'))
+    //console.log("LIGHT ", map.get('Light'))
+
+    for(let state of map.values()){
+        assert(state.name())
+    }
   });
   it('isAncestor', () => {
     assert.isFalse(isAncestor(map.get('On'), map.get('Off')))
@@ -102,10 +70,5 @@ describe('Machine', function () {
     assert.isTrue(isAncestor(map.get('Light'), map.get('Off')))
     assert.isTrue(isAncestor(map.get('Light'), map.get('On')))
   });
-  it.only('walkOnEntry', () => {
-    walkOnEntry(machine, map.get('On'), map.get('Off'))
-  });
-  it('walkOnExit', () => {
-    walkOnExit(machine, map.get('On'), map.get('Off'))
-  });
+
 });

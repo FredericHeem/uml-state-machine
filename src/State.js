@@ -9,16 +9,22 @@ export function traverseState(currentState, parent, callback = _.noop) {
   }
 }
 
-export function buildStateMap(stateRootDef) {
+export function buildStateMap(smDef) {
   const stateMap = new Map();
   const callback = (state, parent) => {
-    //console.log("buildStateMap current: ", state.name, "parent: ", parent)
+    //console.log("callback " ,state)
     const parentModel = parent ? stateMap.get(parent.name) : undefined
-    const stateModel = State(state, parentModel)
+    const stateModel = State(smDef, state, parentModel)
     stateMap.set(state.name, stateModel)
   }
-  traverseState(stateRootDef, null, callback);
-  //console.log("buildStateMap size ", stateMap.size)
+  if(!smDef.state){
+    throw {
+      name: "Parser",
+      message: "Root state is missing: " + smDef,
+      details: smDef
+    }
+  }
+  traverseState(smDef.state, null, callback);
   return stateMap;
 }
 
@@ -27,14 +33,10 @@ function isEqualState(s1, s2){
 }
 
 export function isAncestor(ancestorState, childState){
-  //console.log("isAncestor", ancestorState.name())
   const parent = childState.parent();
   if(!parent){
-    //console.log("isAncestor no parent", childState.name())
     return false
   }
-  //console.log("ancestorState", ancestorState.name())
-  //console.log("childState", childState.name())
   if(isEqualState(ancestorState, parent)){
     return true
   } else {
@@ -43,7 +45,6 @@ export function isAncestor(ancestorState, childState){
 }
 
 export function walkOnEntry(context, previousState, nextState) {
-  //console.log("walkOnEntry", previousState.name(), nextState.name())
   if(!nextState){
     return;
   }
@@ -63,7 +64,6 @@ export function walkOnEntry(context, previousState, nextState) {
 }
 
 export function walkOnExit(context, previousState, nextState) {
-  //console.log("walkOnExit", previousState.name(), nextState.name())
   if(!nextState){
     return;
   }
@@ -78,8 +78,25 @@ export function walkOnExit(context, previousState, nextState) {
   }
 }
 
-export function State(stateInfo = {}, stateParent) {
-  return {
+export function State(smDef, stateInfo = {}, stateParent) {
+  //console.log("State ", stateInfo.name)
+  function createEvents(state, transitions){
+    if(!transitions){
+      return state
+    }
+    const events = _.groupBy(transitions, 'event');
+    //console.log("event ", events)
+    return _.reduce(events, (state, event) => {
+      state[event] = (context) => {
+        console.log("state ", state.name(), "event ", event)
+        console.log("context ", context.action)
+      }
+      return state;
+    }, state)
+  }
+
+
+  let state = {
     isRoot() {
       return !stateParent
     },
@@ -104,4 +121,7 @@ export function State(stateInfo = {}, stateParent) {
       if(stateInfo.onExit) stateInfo.onExit(context)
     }
   }
+
+  state = createEvents(state, stateInfo.transitions);
+  return state;
 }
