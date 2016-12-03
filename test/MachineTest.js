@@ -5,13 +5,13 @@ import {walkOnEntry, walkOnExit} from "../src/State";
 function Light() {
   return {
     doOn() {
-      console.log("doOff")
+      //console.log("doOff")
     },
     doOff() {
-      console.log("doOff")
+      //console.log("doOff")
     },
     log(msg){
-      console.log(`light log: ${msg}`)
+      //console.log(`light log: ${msg}`)
     }
   }
 }
@@ -58,8 +58,20 @@ const smDef = {
 
 describe('Machine', function () {
   const light = Light()
-  const machine = Machine(smDef, light);
+  const machine = Machine({
+    definition: smDef,
+    actioner: light,
+    observers: {
+      onEntry(context, stateName){
+        console.log("OBSERVER onEntry ", stateName)
+      },
+      onExit(context, stateName){
+        console.log("OBSERVER onExit ", stateName)
+      }
+    }
+  });
   const map = machine.stateMap();
+
   it('Light on', () => {
     light.doOn();
   });
@@ -68,12 +80,20 @@ describe('Machine', function () {
     light.doOff();
   });
 
-  it('Machine 1', () => {
+  it.only('Machine 1', () => {
     try {
+      machine.setStateCurrent("On")
+      assert.equal(machine.getStateCurrent().name(), "On")
       machine.evOff()
+      /*
+      assert.equal(machine.getStateCurrent().name(), "Off")
+      machine.evOff()
+      assert.equal(machine.getStateCurrent().name(), "Off")
       machine.evOn()
-      machine.evOff()
-      machine.evOff()
+      assert.equal(machine.getStateCurrent().name(), "On")
+      machine.evOn()
+      assert.equal(machine.getStateCurrent().name(), "On")
+      */
     }
     catch (error) {
       console.error(error)

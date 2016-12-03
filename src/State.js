@@ -49,16 +49,20 @@ export function walkOnEntry(context, previousState, nextState) {
     return;
   }
 
-  if(isEqualState(previousState, nextState)){
-    nextState.onEntry(context.action);
-    return
+  function onEntry(nextState){
+    //console.log("walkOnEntry  ", nextState.name())
+    context.observers.onEntry(context, nextState.name())
+    nextState.onEntry(context.actioner);
   }
 
-  if(!isAncestor(nextState, previousState)){
+  if(isEqualState(previousState, nextState)){
+    onEntry(nextState)
+  }
+  else if(!isAncestor(nextState, previousState)){
     const parent = nextState.parent()
     if(parent){
       walkOnEntry(context, previousState, parent)
-      nextState.onEntry(context.action);
+      onEntry(nextState)
     }
   }
 }
@@ -69,7 +73,8 @@ export function walkOnExit(context, previousState, nextState) {
   }
 
   if(!isAncestor(previousState, nextState)){
-    previousState.onExit(context.action);
+    context.observers.onExit(context, previousState.name())
+    previousState.onExit(context.actioner);
     const parent = nextState.parent()
     if(parent){
       walkOnExit(context, parent, nextState)
@@ -79,12 +84,10 @@ export function walkOnExit(context, previousState, nextState) {
 }
 
 function createAllEvents(state, events){
-  //console.log("createAllEvents ", state.name())
   return _.reduce(events, (state, event) => {
     //console.log("createAllEvents event ", state.name(), event.id)
     state[event.id] = (context) => {
-      console.log("createAllEvents ", event, "event ", event)
-      console.log("createAllEvents context ", context.action)
+      //console.log("unhandle event ", event, ", state: ", context.getStateCurrent().name())
     }
     return state;
   }, state)
@@ -99,8 +102,8 @@ function createEvents(state, transitions){
   const events = _.groupBy(transitions, 'event');
   //console.log("event ", events)
   return _.reduce(events, (state, transitions, key) => {
-    console.log("event key ", key),
-    console.log("transitions ", transitions)
+    //console.log("event key ", key),
+    //console.log("transitions ", transitions)
     state[key] = (context) => {
 
       transitions.some(transition => {
@@ -108,17 +111,20 @@ function createEvents(state, transitions){
             return false;
         }
         if(transition.actions){
-          console.log("transition.actions ", transition.actions.length)
-          transition.actions.forEach(action => action(context.action));
+          //console.log("transition.actions ", transition.actions.length)
+          transition.actions.forEach(action => action(context.actioner));
         }
-
-        if(transition.nextState){
-          console.log("transition.nextState ", transition.nextState)
+        const {nextState: nextStateName} = transition
+        if(nextStateName){
+          const nextState = context.stateMap().get(nextStateName);
+          walkOnExit(context, context.getStateCurrent(), nextState)
+          context.setStateCurrent(transition.nextState)
+          walkOnEntry(context, context.getStateCurrent(), nextState)
         }
         return true
       })
-      console.log("state ", state.name())
-      console.log("context ", context.action)
+      //console.log("state ", state.name())
+      //console.log("context ", context.action)
     }
     return state;
   }, state)
@@ -144,18 +150,18 @@ export function State(smDef, stateInfo = {}, stateParent) {
       return stateInfo;
     },
     onEntry(context){
-      console.log("State onEntry ", stateInfo.name)
+      //console.log("State onEntry ", stateInfo.name)
       if(stateInfo.onEntry) stateInfo.onEntry(context)
     },
     onExit(context){
-      console.log("State onExit ", stateInfo.name)
+      //console.log("State onExit ", stateInfo.name)
       if(stateInfo.onExit) stateInfo.onExit(context)
     }
   })
 
   if(!stateParent){
     state = createAllEvents(state, smDef.events)
-    console.log("state ", state)
+    //console.log("state ", state)
   }
 
   state = createEvents(state, stateInfo.transitions);
