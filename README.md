@@ -130,3 +130,31 @@ onTransitionEnd  S1_1 S2_3
 */
 
 ```
+
+## Observable
+
+To find out what's going on inside the state mahine, customs `observers` can be attached.
+
+Below is an example of a simple observer that logs when a state enters or exits, and when a transition begins and ends.
+
+```javascript
+
+const machine = Machine({
+  definition: smDef,
+  observers: {
+    onEntry(context, stateName) {
+      console.log("onEntry ", stateName)
+    },
+    onExit(context, stateName) {
+      console.log("onExit ", stateName)
+    },
+    onTransitionBegin(context, statePrevious, stateNext) {
+      console.log("onTransitionBegin ", statePrevious, stateNext)
+    },
+    onTransitionEnd(context, statePrevious, stateNext) {
+      console.log("onTransitionEnd ", statePrevious, stateNext)
+    }
+  }
+});
+
+```
