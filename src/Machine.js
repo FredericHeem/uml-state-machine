@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import {State, buildStateMap} from './State'
+import {buildStateMap, findInitialState, walkOnEntry} from './State'
 
 export function Machine({
   definition,
@@ -10,24 +10,47 @@ export function Machine({
   observers = {
     onEntry: _.noop,
     onExit: _.noop,
+    onTransitionBegin: _.noop,
+    onTransitionEnd: _.noop,
     ...observers
   }
 
-  let currentState = State(definition, definition.state, null);
+  const stateMap = buildStateMap(definition);
+  let currentState = getRootState()
   let previousState = null;
   let nextState = null;
 
-  const stateMap = buildStateMap(definition);
+  function getRootState(){
+    return stateMap.get(definition.state.name)
+  }
+
+  function enterInitialState(){
+    const initialStateName = findInitialState(definition.state);
+    walkOnEntry(machine, getRootState(), stateMap.get(initialStateName));
+    setStateCurrent(initialStateName)
+  }
 
   function getCurrentState(){
     return currentState
+  }
+
+  function setStateCurrent(stateName){
+    currentState = stateMap.get(stateName)
+    if(!currentState){
+      throw {
+        name: "RunTime",
+        message: "invalid state name",
+        function: "setStateCurrent",
+        details: stateName
+      }
+    }
   }
 
   function setStateNext(stateName){
     nextState = stateName
   }
 
-  function addEvents(machine, events) {
+  function addEventHandlers(machine, events) {
     return events.reduce((machine, event) => {
       if (!event.id) {
         throw {
@@ -39,10 +62,12 @@ export function Machine({
 
       machine[event.id] = (payload) => {
         //console.log("event id ", event.id, ", payload: ", payload)
+
+        const previousState = getCurrentState();
         const currentState = getCurrentState();
-        //console.log("getCurrentState ", currentState.name())
-        //console.log("currentState ", currentState)
+        //observers.onTransitionBegin(machine, previousState.name())
         currentState[event.id](machine, payload)
+        //observers.onTransitionEnd(machine, currentState.name(), getCurrentState().name())
       }
       return machine;
     }, machine);
@@ -54,30 +79,28 @@ export function Machine({
     stateMap(){
       return stateMap;
     },
-    setStateCurrent(stateName){
-       currentState = stateMap.get(stateName)
-       if(!currentState){
-        throw {
-          name: "RunTime",
-          message: "invalid state name",
-          function: "setStateCurrent",
-          details: stateName
-        }
-       }
-    },
+    enterInitialState,
+    setStateCurrent,
     getStateCurrent(){
       return currentState
     },
     getStatePrevious(){
       return previousState
     },
+    setStatePrevious(state){
+      previousState = state
+    },
     getStateNext(){
       return nextState
     },
-    setStateNext
+    setStateNext,
+    setStatePreviousFromCurrent(){
+      previousState = currentState;
+      return previousState;
+    }
   };
 
-  machine = addEvents(machine, definition.events)
+  machine = addEventHandlers(machine, definition.events)
 
   return machine
 }

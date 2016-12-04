@@ -1,66 +1,84 @@
 import { assert } from 'chai';
 import { Machine } from '../src/index';
-import {walkOnEntry, walkOnExit} from "../src/State";
 
-function Light() {
+function Operation() {
   return {
-    doOn() {
+    request() {
       //console.log("doOff")
     },
-    doOff() {
+    cancel() {
       //console.log("doOff")
     },
     log(msg){
-      //console.log(`light log: ${msg}`)
+      console.log(`Operation log: ${msg}`)
     }
   }
 }
 
 const smDef = {
-  name: "LightSwitch",
+  name: "AsyncOp",
   events: [
     {
-      id: "evOn"
+      id: "evRequest"
     },
     {
-      id: "evOff"
-    }
+      id: "evOk"
+    },
+    {
+      id: "evError"
+    },
+    {
+      id: "evReset"
+    },
   ],
 
   state: {
-    name: "Light",
+    name: "AsyncOp",
+    transitions: [
+      {
+        event: "evReset",
+        nextState: "Idle",
+        onEntry: op => op.cancel(),
+      }
+    ],
     states: [
       {
-        name: "Off",
-        onEntry: light => light.doOff(),
+        name: "Idle",
         transitions: [{
-          event: "evOn",
-          nextState: "On",
-          actions:[
-            light => light.log("starting on")
-          ]
+          event: "evRequest",
+          nextState: "Loading"
         }]
       },
       {
-        name: "On",
-        onEntry: light => light.doOn(),
+        name: "Error",
+        final: true
+      },
+      {
+        name: "Loading",
+        onEntry: op => op.request(),
         transitions: [{
-          event: "evOff",
-          nextState: "Off",
+          event: "evOk",
+          nextState: "Loaded",
           actions:[
-            light => light.log("starting off")
+            op => op.log("Loaded")
           ]
+        },{
+          event: "evError",
+          nextState: "Error"
         }]
+      },
+      {
+        name: "Loaded"
       }
     ]
   }
 }
 
-describe('Machine', function () {
-  const light = Light()
+describe('Machine Ops', function () {
+  const operation = Operation()
   const machine = Machine({
     definition: smDef,
-    actioner: light,
+    actioner: operation,
     observers: {
       onEntry(context, stateName){
         console.log("onEntry ", stateName)
@@ -76,21 +94,22 @@ describe('Machine', function () {
       }
     }
   });
-  const map = machine.stateMap();
 
-  it('Machine 1', () => {
+  it.only('Machine Ops', () => {
     try {
       console.log("enterInitialState")
       machine.enterInitialState();
 
-      assert.equal(machine.getStateCurrent().name(), "Off")
-      console.log("sending the On event")
-      machine.evOn()
-      assert.equal(machine.getStateCurrent().name(), "On")
+      assert.equal(machine.getStateCurrent().name(), "Idle")
+      console.log("sending the request event")
+      machine.evRequest()
+      assert.equal(machine.getStateCurrent().name(), "Loading")
 
-      machine.evOn()
-      assert.equal(machine.getStateCurrent().name(), "On")
+      machine.evOk()
+      assert.equal(machine.getStateCurrent().name(), "Loaded")
 
+      machine.evReset()
+      assert.equal(machine.getStateCurrent().name(), "Idle")
       /*
       machine.evOff()
       assert.equal(machine.getStateCurrent().name(), "Off")
@@ -103,10 +122,5 @@ describe('Machine', function () {
       assert(!error)
     }
   });
-  it('walkOnEntry', () => {
-    walkOnEntry(machine, map.get('On'), map.get('Off'))
-  });
-  it('walkOnExit', () => {
-    walkOnExit(machine, map.get('On'), map.get('Off'))
-  });
+
 });
