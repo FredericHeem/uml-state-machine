@@ -20,6 +20,12 @@ Here is the hello word of finite state machine: a light switch:
  * 2 states: `Off` and `On`.
  * 2 actions: `light.doOff()` and  `light.doOn()`.
 
+State machine diagram desscribing the light switch:
+
+
+![alt text](doc/img/state-machine-light.png "state-machine-light")
+
+
 ```javascript
 
 const stateMachineDefinition = {
@@ -84,6 +90,8 @@ machine.evOn();
 
 ## Hierarchical example
 
+Hierarchical state machine allows to model state as a tree, the goal is to gather states that share common transitions. 
+When transitioning from one state to another, a chain of `onExit` and `onEntry` functions is called. 
 
 ```javascript
 const smDef = {
