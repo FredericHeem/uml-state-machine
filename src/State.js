@@ -112,8 +112,8 @@ export function findInitialState(stateInfo) {
 
 function createAllEvents(state, events) {
   return _.reduce(events, (state, event) => {
-    //console.log("createAllEvents event ", state.name(), event.id)
-    state[event.id] = (context) => {
+    console.log("createAllEvents event ", state.name(), event)
+    state[event] = (context) => {
       //console.log("unhandle event ", event, ", state: ", context.getStateCurrent().name())
     }
     return state;

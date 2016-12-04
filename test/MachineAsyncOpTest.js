@@ -17,21 +17,7 @@ function Operation() {
 
 const smDef = {
   name: "AsyncOp",
-  events: [
-    {
-      id: "evRequest"
-    },
-    {
-      id: "evOk"
-    },
-    {
-      id: "evError"
-    },
-    {
-      id: "evReset"
-    },
-  ],
-
+  events: ["evRequest", "evOk", "evError", "evReset"],
   state: {
     name: "AsyncOp",
     transitions: [
@@ -95,7 +81,7 @@ describe('Machine Ops', function () {
     }
   });
 
-  it.only('Machine Ops', () => {
+  it('Machine Ops', () => {
     try {
       console.log("enterInitialState")
       machine.enterInitialState();

@@ -52,22 +52,21 @@ export function Machine({
 
   function addEventHandlers(machine, events) {
     return events.reduce((machine, event) => {
-      if (!event.id) {
-        throw {
-          name: "Parser",
-          message: "Event id is missing",
-          details: event
-        }
-      }
-
-      machine[event.id] = (payload) => {
-        //console.log("event id ", event.id, ", payload: ", payload)
-
-        const previousState = getCurrentState();
+      const eventId = event;
+      //console.log("add event id ", event)
+      machine[eventId] = (payload) => {
+        //console.log("Rx Event id ", eventId, ", payload: ", payload)
         const currentState = getCurrentState();
-        //observers.onTransitionBegin(machine, previousState.name())
-        currentState[event.id](machine, payload)
-        //observers.onTransitionEnd(machine, currentState.name(), getCurrentState().name())
+        if(currentState[eventId]){
+          currentState[eventId](machine, payload)
+        } else {
+          throw {
+            name: "Internal",
+            eventId: eventId,
+            state: currentState.name(),
+            details: currentState
+          }
+        }
       }
       return machine;
     }, machine);

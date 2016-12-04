@@ -18,14 +18,7 @@ npm install state-machine --save
 
 const stateMachineDefinition = {
   name: "LightSwitch",
-  events: [
-    {
-      id: "evOn"
-    },
-    {
-      id: "evOff"
-    }
-  ],
+  events: ["evOn", "evOff"],
 
   state: {
     name: "Light",

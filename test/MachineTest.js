@@ -18,15 +18,7 @@ function Light() {
 
 const smDef = {
   name: "LightSwitch",
-  events: [
-    {
-      id: "evOn"
-    },
-    {
-      id: "evOff"
-    }
-  ],
-
+  events: ["evOn", "evOff"],
   state: {
     name: "Light",
     states: [
