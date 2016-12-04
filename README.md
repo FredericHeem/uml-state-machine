@@ -9,16 +9,16 @@ An implemenation of the UML state machine pattern in Javascript.
 ## Install
 
 ```bash
-npm installuml-state-machine --save
+npm install uml-state-machine --save
 ```
 
 ## Usage
 
 Here is the hello word of finite state machine: a light switch: 
 
- * 2 events. `evOn` and `evOff`
- * 2 states: `Off` and `On`
- * 2 actions: `light.doOff()` and  `light.doOn()`
+ * 2 events: `evOn` and `evOff`.
+ * 2 states: `Off` and `On`.
+ * 2 actions: `light.doOff()` and  `light.doOn()`.
 
 ```javascript
 
