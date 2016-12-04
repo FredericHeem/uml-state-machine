@@ -112,7 +112,7 @@ export function findInitialState(stateInfo) {
 
 function createAllEvents(state, events) {
   return _.reduce(events, (state, event) => {
-    console.log("createAllEvents event ", state.name(), event)
+    //console.log("createAllEvents event ", state.name(), event)
     state[event] = (context) => {
       //console.log("unhandle event ", event, ", state: ", context.getStateCurrent().name())
     }
@@ -128,7 +128,7 @@ function createEvents(state, transitions) {
   const events = _.groupBy(transitions, 'event');
   //console.log("event ", events)
   return _.reduce(events, (state, transitions, key) => {
-    console.log("adding event key ", key, " to state ", state.name()),
+    //console.log("adding event key ", key, " to state ", state.name()),
     //console.log("transitions ", transitions)
     state[key] = (context) => {
 

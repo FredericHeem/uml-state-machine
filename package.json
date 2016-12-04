@@ -1,25 +1,27 @@
 {
-  "name": "state-machine",
+  "name": "uml-state-machine",
   "version": "0.1.0",
   "license": "Apache-2.0",
-  "description": "Awesome state machine.",
+  "description": "UML state machine in Javascript.",
   "keywords": [
     "state machine",
     "fsm",
+    "finite state machine",
+    "hierarchical",
     "es6"
   ],
   "main": "lib/index.js",
-  "homepage": "https://github.com/FredericHeem/state-machine",
+  "homepage": "https://github.com/FredericHeem/uml-state-machine",
   "author": {
     "name": "Frederic Heem",
     "url": "https://github.com/FredericHeem"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/FredericHeem/state-machine"
+    "url": "https://github.com/FredericHeem/uml-state-machine"
   },
   "bugs": {
-    "url": "https://github.com/FredericHeem/state-machine/issues"
+    "url": "https://github.com/FredericHeem/uml-state-machine/issues"
   },
   "devDependencies": {
     "babel-cli": "6.11.4",
