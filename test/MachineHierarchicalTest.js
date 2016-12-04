@@ -5,43 +5,27 @@ const smDef = {
   name: "Hierarchical",
   events: ["evOn", "evOff"],
   state: {
-    name: "S",
     transitions: [{event:"evOn", nextState:"S2_3"}],
-    states: [
-      {
-        name: "S1",
-        states: [
-          {
-            name: "S1_1"
-          },
-          {
-            name: "S1_2",
-            states: [
-              {
-                name: "S1_2_1"
-              },
-              {
-                name: "S1_2_2"
-              }
-            ]
+    states: {
+      "S1": {
+        states:{
+          "S1_1":{},
+          "S1_2":{
+            states:{
+              "S1_2_1":{},
+              "S1_2_2":{}
+            }
           }
-        ]
+        }
       },
-      {
-        name: "S2",
-        states: [
-          {
-            name: "S2_1"
-          },
-          {
-            name: "S2_2"
-          },
-          {
-            name: "S2_3"
-          }
-        ]
+      "S2":{
+        states:{
+          "S2_1":{},
+          "S2_2":{},
+          "S2_3":{}
+        }
       }
-    ]
+    }
   }
 }
 
@@ -64,7 +48,7 @@ describe('Hierarchical', function () {
     }
   });
 
-  it.only('Hierarchical', () => {
+  it('Hierarchical', () => {
     try {
       machine.enterInitialState();
       assert.equal(machine.getStateCurrent().name(), "S1_1")

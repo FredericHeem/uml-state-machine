@@ -31,12 +31,9 @@ State machine diagram describing the light switch:
 const stateMachineDefinition = {
   name: "LightSwitch",
   events: ["evOn", "evOff"],
-
   state: {
-    name: "Light",
-    states: [
-      {
-        name: "Off",
+    states: {
+      "Off": {
         onEntry: light => light.doOff(),
         transitions: [{
           event: "evOn",
@@ -46,8 +43,7 @@ const stateMachineDefinition = {
           ]
         }]
       },
-      {
-        name: "On",
+      "On": {
         onEntry: light => light.doOn(),
         transitions: [{
           event: "evOff",
@@ -57,7 +53,7 @@ const stateMachineDefinition = {
           ]
         }]
       }
-    ]
+    }
   }
 }
 
@@ -65,21 +61,7 @@ const light = Light();
 
 const machine = Machine({
   definition: stateMachineDefinition,
-  actioner: light,
-  observers: {
-    onEntry(context, stateName){
-      console.log("onEntry ", stateName)
-    },
-    onExit(context, stateName){
-      console.log("onExit ", stateName)
-    },
-    onTransitionBegin(context, statePrevious, stateNext){
-      console.log("onTransitionBegin ", statePrevious, stateNext)
-    },
-    onTransitionEnd(context, statePrevious, stateNext){
-      console.log("onTransitionEnd ", statePrevious, stateNext)
-    }
-  }
+  actioner: light
 });
 
 machine.enterInitialState();
@@ -102,43 +84,27 @@ const smDef = {
   name: "Hierarchical",
   events: ["evOn", "evOff"],
   state: {
-    name: "S",
     transitions: [{event:"evOn", nextState:"S2_3"}],
-    states: [
-      {
-        name: "S1",
-        states: [
-          {
-            name: "S1_1"
-          },
-          {
-            name: "S1_2",
-            states: [
-              {
-                name: "S1_2_1"
-              },
-              {
-                name: "S1_2_2"
-              }
-            ]
+    states: {
+      "S1": {
+        states:{
+          "S1_1":{},
+          "S1_2":{
+            states:{
+              "S1_2_1":{},
+              "S1_2_2":{}
+            }
           }
-        ]
+        }
       },
-      {
-        name: "S2",
-        states: [
-          {
-            name: "S2_1"
-          },
-          {
-            name: "S2_2"
-          },
-          {
-            name: "S2_3"
-          }
-        ]
+      "S2":{
+        states:{
+          "S2_1":{},
+          "S2_2":{},
+          "S2_3":{}
+        }
       }
-    ]
+    }
   }
 }
 

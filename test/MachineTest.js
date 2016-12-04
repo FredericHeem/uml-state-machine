@@ -20,10 +20,8 @@ const smDef = {
   name: "LightSwitch",
   events: ["evOn", "evOff"],
   state: {
-    name: "Light",
-    states: [
-      {
-        name: "Off",
+    states: {
+      "Off": {
         onEntry: light => light.doOff(),
         transitions: [{
           event: "evOn",
@@ -33,8 +31,7 @@ const smDef = {
           ]
         }]
       },
-      {
-        name: "On",
+      "On": {
         onEntry: light => light.doOn(),
         transitions: [{
           event: "evOff",
@@ -44,7 +41,7 @@ const smDef = {
           ]
         }]
       }
-    ]
+    }
   }
 }
 
@@ -83,12 +80,6 @@ describe('Machine', function () {
       machine.evOn()
       assert.equal(machine.getStateCurrent().name(), "On")
 
-      /*
-      machine.evOff()
-      assert.equal(machine.getStateCurrent().name(), "Off")
-      machine.evOff()
-      assert.equal(machine.getStateCurrent().name(), "Off")
-      */
     }
     catch (error) {
       console.error(error)

@@ -2,36 +2,31 @@ import { assert } from 'chai';
 import {State, traverseState, buildStateMap, isAncestor} from "../src/State";
 
 const smDef = {
-  name: "Basic machine 1",
-  events: [
-    {
-      id: "evOn"
-    },
-    {
-      id: "evOff"
-    }
-  ],
-
+  name: "LightSwitch",
+  events: ["evOn", "evOff"],
   state: {
-    name: "Light",
-    states: [
-      {
-        name: "Off",
+    states: {
+      "Off": {
         onEntry: light => light.doOff(),
         transitions: [{
           event: "evOn",
-          nextState: "On"
+          nextState: "On",
+          actions:[
+            light => light.log("starting on")
+          ]
         }]
       },
-      {
-        name: "On",
+      "On": {
         onEntry: light => light.doOn(),
         transitions: [{
           event: "evOff",
-          nextState: "Off"
+          nextState: "Off",
+          actions:[
+            light => light.log("starting off")
+          ]
         }]
       }
-    ]
+    }
   }
 }
 
@@ -56,18 +51,18 @@ describe('Machine', function () {
   it('buildStateMap', () => {
     assert.equal(map.size, 3);
     assert(map.get('On'))
-    assert(map.get('Light'))
+    assert(map.get('Root'))
 
     for(let state of map.values()){
         assert(state.name())
     }
   });
   it('isAncestor', () => {
-    assert.isTrue(isAncestor(map.get('Light'), map.get('Light')))
+    assert.isTrue(isAncestor(map.get('Root'), map.get('Root')))
     assert.isTrue(isAncestor(map.get('On'), map.get('On')))
     assert.isFalse(isAncestor(map.get('On'), map.get('Off')))
-    assert.isTrue(isAncestor(map.get('Light'), map.get('Off')))
-    assert.isTrue(isAncestor(map.get('Light'), map.get('On')))
+    assert.isTrue(isAncestor(map.get('Root'), map.get('Off')))
+    assert.isTrue(isAncestor(map.get('Root'), map.get('On')))
   });
 
 });

@@ -21,7 +21,7 @@ export function Machine({
   let nextState = null;
 
   function getRootState(){
-    return stateMap.get(definition.state.name)
+    return stateMap.get("Root")
   }
 
   function enterInitialState(){
@@ -53,9 +53,7 @@ export function Machine({
   function addEventHandlers(machine, events) {
     return events.reduce((machine, event) => {
       const eventId = event;
-      //console.log("add event id ", event)
       machine[eventId] = (payload) => {
-        //console.log("Rx Event id ", eventId, ", payload: ", payload)
         const currentState = getCurrentState();
         if(currentState[eventId]){
           currentState[eventId](machine, payload)

@@ -19,7 +19,6 @@ const smDef = {
   name: "AsyncOp",
   events: ["evRequest", "evOk", "evError", "evReset"],
   state: {
-    name: "AsyncOp",
     transitions: [
       {
         event: "evReset",
@@ -27,20 +26,17 @@ const smDef = {
         onEntry: op => op.cancel(),
       }
     ],
-    states: [
-      {
-        name: "Idle",
+    states: {
+      "Idle":{
         transitions: [{
           event: "evRequest",
           nextState: "Loading"
         }]
       },
-      {
-        name: "Error",
+      "Error":{
         final: true
       },
-      {
-        name: "Loading",
+      "Loading": {
         onEntry: op => op.request(),
         transitions: [{
           event: "evOk",
@@ -53,10 +49,10 @@ const smDef = {
           nextState: "Error"
         }]
       },
-      {
-        name: "Loaded"
+      "Loaded":{
+
       }
-    ]
+    }
   }
 }
 

@@ -2,21 +2,14 @@ import _ from 'lodash';
 
 export function traverseState(currentState, parent, callback = _.noop) {
   callback(currentState, parent)
-  if (currentState.states) {
-    currentState.states.forEach(state => {
-      traverseState(state, currentState, callback)
-    })
-  }
+  _.map(currentState.states, (state, name) => {
+    state.name = name
+    traverseState(state, currentState, callback)
+  })
 }
 
 export function buildStateMap(smDef) {
   const stateMap = new Map();
-  const callback = (state, parent) => {
-    //console.log("callback " ,state)
-    const parentModel = parent ? stateMap.get(parent.name) : undefined
-    const stateModel = State(smDef, state, parentModel)
-    stateMap.set(state.name, stateModel)
-  }
   if (!smDef.state) {
     throw {
       name: "Parser",
@@ -24,6 +17,13 @@ export function buildStateMap(smDef) {
       details: smDef
     }
   }
+  smDef.state.name = "Root";
+  const callback = (state, parent) => {
+    const parentModel = parent ? stateMap.get(parent.name) : undefined
+    const stateModel = State(smDef, state, parentModel)
+    stateMap.set(state.name, stateModel)
+  }
+
   traverseState(smDef.state, null, callback);
   return stateMap;
 }
@@ -50,9 +50,7 @@ export function isAncestor(ancestorState, childState) {
 function processTransactionPre(context, stateNext) {
   const statePrevious = context.setStatePreviousFromCurrent();
   context.setStateNext(stateNext);
-
   context.observers.onTransitionBegin(context, statePrevious.name(), stateNext.name());
-
   walkOnExit(context, statePrevious, stateNext)
 }
 
@@ -112,9 +110,12 @@ export function walkOnExit(context, previousState, nextState) {
 }
 
 export function findInitialState(stateInfo) {
-  const {states} = stateInfo
-  if (states && states[0]) {
-    return findInitialState(states[0])
+  const {states} = stateInfo;
+  const firstChildName = _.keys(states)[0];
+  if (firstChildName) {
+    const firstChild = stateInfo.states[firstChildName]
+    firstChild.name = firstChildName
+    return findInitialState(firstChild)
   } else {
     return stateInfo.name;
   }
