@@ -142,8 +142,10 @@ onEntry  S1_1
 */
 machine.evOn()
 /*
+
 onTransitionBegin  S1_1 S2_3
 onExit  S1_1
+onExit  S1
 onEntry  S2
 onEntry  S2_3
 onTransitionEnd  S1_1 S2_3

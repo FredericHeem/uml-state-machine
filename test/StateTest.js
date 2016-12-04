@@ -63,8 +63,9 @@ describe('Machine', function () {
     }
   });
   it('isAncestor', () => {
+    assert.isTrue(isAncestor(map.get('Light'), map.get('Light')))
+    assert.isTrue(isAncestor(map.get('On'), map.get('On')))
     assert.isFalse(isAncestor(map.get('On'), map.get('Off')))
-    assert.isFalse(isAncestor(map.get('On'), map.get('On')))
     assert.isTrue(isAncestor(map.get('Light'), map.get('Off')))
     assert.isTrue(isAncestor(map.get('Light'), map.get('On')))
   });

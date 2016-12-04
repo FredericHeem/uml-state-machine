@@ -33,6 +33,9 @@ function isEqualState(s1, s2) {
 }
 
 export function isAncestor(ancestorState, childState) {
+  if (isEqualState(ancestorState, childState)) {
+    return true
+  }
   const parent = childState.parent();
   if (!parent) {
     return false
@@ -89,14 +92,21 @@ export function walkOnExit(context, previousState, nextState) {
   if (!nextState) {
     return;
   }
+  //console.log("walkOnExit ", previousState.name(), nextState.name())
+  function onExit(state) {
+    context.observers.onExit(context, state.name())
+    state.onExit(context.actioner);
+  }
 
-  if (!isAncestor(previousState, nextState)) {
-    context.observers.onExit(context, previousState.name())
-    previousState.onExit(context.actioner);
-    const parent = nextState.parent()
+  if (isEqualState(previousState, nextState)) {
+    onExit(nextState);
+  }
+  else if (!isAncestor(previousState, nextState)) {
+    onExit(previousState);
+    const parent = previousState.parent()
     if (parent) {
+      //console.log("walkOnExit parent ", parent.name())
       walkOnExit(context, parent, nextState)
-      return;
     }
   }
 }
