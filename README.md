@@ -1,5 +1,7 @@
 # UML State Machine
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/FredericHeem/uml-state-machine.svg)](https://greenkeeper.io/)
+
 An implemenation of the UML state machine pattern in Javascript. 
 
 * Hierarchical
