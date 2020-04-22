@@ -153,9 +153,9 @@ function createEvents(state, transitions) {
     (state, transitions, key) => {
       //console.log("adding event key ", key, " to state ", state.name()),
       //console.log("transitions ", transitions)
-      state[key] = (context) => {
+      state[key] = (context, payload) => {
         transitions.some((transition) => {
-          if (transition.condition && !transition.condition()) {
+          if (transition.condition && !transition.condition(context, payload)) {
             return false;
           }
 
