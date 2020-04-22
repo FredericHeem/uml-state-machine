@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug test",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+      "stopOnEntry": false,
+      "args": [
+        "--no-timeouts",
+        "--colors",
+        "--config",
+        "${workspaceRoot}/.mocharc.json"
+      ],
+      "cwd": "${workspaceRoot}/",
+      "runtimeExecutable": null,
+      "env": {
+        "NODE_PATH": "src"
+      }
+    }
+  ]
+}

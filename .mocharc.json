@@ -1,0 +1,11 @@
+{
+  "watch-files": ["src/**/*.js"],
+  "spec": ["test/**/*est.js"],
+  "extension": ["js"],
+  "reporter": "spec",
+  "timeout": 200000,
+  "ui": "bdd",
+  "bail": true,
+  "recursive": true,
+  "require": "babel-core/register"
+}
